@@ -1,11 +1,9 @@
 package com.example;
 
-import java.util.List;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.model.CreateTableRequest;
 import com.amazonaws.services.dynamodbv2.model.ProvisionedThroughput;
-import com.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Component;
@@ -33,8 +31,8 @@ public class DynamoService<T> {
         mapper.batchDelete(repo.findAll());
     }
 
-    public List<T> getAllRecords() {
-        return Lists.newArrayList(repo.findAll());
+    public Iterable<T> getAllRecords() {
+        return repo.findAll();
     }
 
     public void insertRecord(T payload) {

@@ -1,14 +1,15 @@
 package com.example;
 
-import java.util.List;
+import java.util.Iterator;
 import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsEqual.equalTo;
-import static org.hamcrest.MatcherAssert.assertThat;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest(classes = { Config.class, DynamoService.class })
 public class DynamoTest {
@@ -30,15 +31,16 @@ public class DynamoTest {
     }
 
     dynamo.deleteAllRecords();
-    List<Product> records = dynamo.getAllRecords();
-    assertThat(records.size(), is(equalTo(0)));
+    Iterator<Product> records = dynamo.getAllRecords().iterator();
+    assertFalse(records.hasNext());
 
     dynamo.insertRecord(new Product(price, cost));
-    records = dynamo.getAllRecords();
-    assertThat(records.size(), is(equalTo(1)));
+    records = dynamo.getAllRecords().iterator();
+    assertTrue(records.hasNext());
 
-    Product record = records.get(0);
-    assertThat(record.getPrice(), is(equalTo(price)));
-    assertThat(record.getCost(), is(equalTo(cost)));
+    Product record = records.next();
+    assertEquals(price, record.getPrice());
+    assertEquals(cost, record.getCost());
+    assertFalse(records.hasNext());
   }
 }
