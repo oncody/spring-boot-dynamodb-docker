@@ -24,7 +24,11 @@ public class DynamoTest {
     String price = "50";
     String cost = "20";
 
-    dynamo.createTable(Product.class);
+    try {
+      dynamo.createTable(Product.class);
+    } catch (Exception e) {
+    }
+
     dynamo.deleteAllRecords();
     List<Product> records = dynamo.getAllRecords();
     assertThat(records.size(), is(equalTo(0)));
