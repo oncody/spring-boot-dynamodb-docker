@@ -1,0 +1,8 @@
+.settings
+target
+.factorypath
+.classpath
+.project
+.vscode
+native-libs
+*.db
