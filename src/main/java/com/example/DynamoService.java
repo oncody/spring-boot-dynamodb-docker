@@ -22,7 +22,7 @@ public class DynamoService {
         getTable(table).deleteTable();
     }
 
-    public Iterator<Object> getAllRecords(DynamoTable table) {
+    public Iterator getAllRecords(DynamoTable table) {
         return getTable(table).scan().items().iterator();
     }
 
