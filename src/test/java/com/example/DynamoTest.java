@@ -13,9 +13,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest(classes = { Config.class, DynamoService.class })
 public class DynamoTest {
-  private final DynamoService<Product> dynamo;
+  private final DynamoService dynamo;
 
-  DynamoTest(@Autowired DynamoService<Product> dynamo) {
+  DynamoTest(@Autowired DynamoService dynamo) {
     this.dynamo = dynamo;
   }
 
@@ -26,19 +26,23 @@ public class DynamoTest {
     String cost = "20";
 
     try {
-      dynamo.createTable(Product.class);
+      dynamo.deleteTable(Product.class, "Product");
+    } catch (Exception e) {
+    }
+    
+    try {
+      dynamo.createTable(Product.class, "Product");
     } catch (Exception e) {
     }
 
-    dynamo.deleteAllRecords();
-    Iterator<Product> records = dynamo.getAllRecords().iterator();
+    Iterator records = dynamo.getAllRecords(Product.class, "Product");
     assertFalse(records.hasNext());
 
-    dynamo.insertRecord(new Product(price, cost));
-    records = dynamo.getAllRecords().iterator();
+    dynamo.insertRecord(Product.class, "Product", new Product(price, cost));
+    records = dynamo.getAllRecords(Product.class, "Product");
     assertTrue(records.hasNext());
 
-    Product record = records.next();
+    Product record = (Product) records.next();
     assertEquals(price, record.getPrice());
     assertEquals(cost, record.getCost());
     assertFalse(records.hasNext());

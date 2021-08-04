@@ -1,42 +1,34 @@
 package com.example;
 
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
-import com.amazonaws.services.dynamodbv2.model.CreateTableRequest;
-import com.amazonaws.services.dynamodbv2.model.ProvisionedThroughput;
+import java.util.Iterator;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Component;
 
+import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
+import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
+
 @Component
-public class DynamoService<T> {
-    private final AmazonDynamoDB dynamo;
-    private final DynamoDBMapper mapper;
-    private final CrudRepository<T, String> repo;
+public class DynamoService {
+    private final DynamoDbEnhancedClient database;
 
-    public DynamoService(@Autowired AmazonDynamoDB dynamo, @Autowired DynamoDBMapper mapper,
-            @Autowired CrudRepository<T, String> repo) {
-        this.dynamo = dynamo;
-        this.mapper = mapper;
-        this.repo = repo;
+    public DynamoService(@Autowired DynamoDbEnhancedClient database) {
+        this.database = database;
     }
 
-    public void createTable(Class clazz) {
-        CreateTableRequest tableRequest = mapper.generateCreateTableRequest(clazz);
-        tableRequest.setProvisionedThroughput(new ProvisionedThroughput(1L, 1L));
-        dynamo.createTable(tableRequest);
+    public void createTable(Class clazz, String tableName) {
+        database.table(tableName, TableSchema.fromClass(clazz)).createTable();
     }
 
-    public void deleteAllRecords() {
-        mapper.batchDelete(repo.findAll());
+    public void deleteTable(Class clazz, String tableName) {
+        database.table(tableName, TableSchema.fromClass(clazz)).deleteTable();
     }
 
-    public Iterable<T> getAllRecords() {
-        return repo.findAll();
+    public Iterator<Object> getAllRecords(Class clazz, String tableName) {
+        return database.table(tableName, TableSchema.fromBean(clazz)).scan().items().iterator();
     }
 
-    public void insertRecord(T payload) {
-        repo.save(payload);
+    public void insertRecord(Class clazz, String tableName, Object payload) {
+        database.table(tableName, TableSchema.fromBean(clazz)).putItem(payload);
     }
 }
