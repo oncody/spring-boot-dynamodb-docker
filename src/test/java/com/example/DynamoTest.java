@@ -3,8 +3,8 @@ package com.example;
 import java.util.Iterator;
 import java.util.concurrent.TimeUnit;
 
-import com.example.table.DynamoTable;
-import com.example.table.ProductTable;
+import com.example.model.DynamoModel;
+import com.example.model.Product;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
@@ -26,7 +26,7 @@ public class DynamoTest {
   @Test
   @Timeout(value = 10, unit = TimeUnit.SECONDS)
   public void testProductTable() {
-    DynamoTable productTable = new ProductTable();
+    DynamoModel productTable = new Product();
     String price = "50";
     String cost = "20";
 
@@ -45,11 +45,11 @@ public class DynamoTest {
     Iterator records = dynamo.getAllRecords(productTable);
     assertFalse(records.hasNext());
 
-    dynamo.insertRecord(productTable, new ProductTable(price, cost));
+    dynamo.insertRecord(productTable, new Product(price, cost));
     records = dynamo.getAllRecords(productTable);
     assertTrue(records.hasNext());
 
-    ProductTable record = (ProductTable) records.next();
+    Product record = (Product) records.next();
     assertEquals(price, record.getPrice());
     assertEquals(cost, record.getCost());
     assertFalse(records.hasNext());

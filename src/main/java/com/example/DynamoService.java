@@ -1,7 +1,9 @@
 package com.example;
 
 import java.util.Iterator;
-import com.example.table.DynamoTable;
+
+import com.example.model.DynamoModel;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbTable;
@@ -14,23 +16,23 @@ public class DynamoService {
         this.database = database;
     }
 
-    public void createTable(DynamoTable table) {
-        getTable(table).createTable();
+    public void createTable(DynamoModel model) {
+        getTable(model).createTable();
     }
 
-    public void deleteTable(DynamoTable table) {
-        getTable(table).deleteTable();
+    public void deleteTable(DynamoModel model) {
+        getTable(model).deleteTable();
     }
 
-    public Iterator getAllRecords(DynamoTable table) {
-        return getTable(table).scan().items().iterator();
+    public Iterator getAllRecords(DynamoModel model) {
+        return getTable(model).scan().items().iterator();
     }
 
-    public void insertRecord(DynamoTable table, Object payload) {
-        getTable(table).putItem(payload);
+    public void insertRecord(DynamoModel model, Object payload) {
+        getTable(model).putItem(payload);
     }
 
-    private DynamoDbTable getTable(DynamoTable table) {
-        return database.table(table.tableName(), TableSchema.fromBean(table.getClass()));
+    private DynamoDbTable getTable(DynamoModel model) {
+        return database.table(model.modelName(), TableSchema.fromBean(model.getClass()));
     }
 }
