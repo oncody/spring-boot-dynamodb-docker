@@ -24,8 +24,8 @@ public class DynamoTest {
   }
 
   @Test
-  @Timeout(value = 10, unit = TimeUnit.SECONDS)
-  public void testProductTable() {
+  @Timeout(value = 5, unit = TimeUnit.SECONDS)
+  public void testTablesCreatedAreEmpty() {
     DynamoModel productTable = new Product();
     String price = "50";
     String cost = "20";
@@ -44,7 +44,28 @@ public class DynamoTest {
 
     Iterator records = dynamo.getAllRecords(productTable);
     assertFalse(records.hasNext());
+  }
 
+  @Test
+  @Timeout(value = 5, unit = TimeUnit.SECONDS)
+  public void testInsertingAndGettingRecord() {
+    DynamoModel productTable = new Product();
+    String price = "50";
+    String cost = "20";
+
+    try {
+      dynamo.deleteTable(productTable);
+    } catch (Exception e) {
+      System.out.println(e);
+    }
+
+    try {
+      dynamo.createTable(productTable);
+    } catch (Exception e) {
+      System.out.println(e);
+    }
+
+    Iterator records = dynamo.getAllRecords(productTable);
     dynamo.insertRecord(productTable, new Product(price, cost));
     records = dynamo.getAllRecords(productTable);
     assertTrue(records.hasNext());
