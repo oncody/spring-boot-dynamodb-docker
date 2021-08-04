@@ -1,14 +1,12 @@
 package com.example;
 
 import java.util.Iterator;
-
+import com.example.table.DynamoTable;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
+import software.amazon.awssdk.enhanced.dynamodb.DynamoDbTable;
 import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
 
-@Component
 public class DynamoService {
     private final DynamoDbEnhancedClient database;
 
@@ -16,19 +14,23 @@ public class DynamoService {
         this.database = database;
     }
 
-    public void createTable(Class clazz, String tableName) {
-        database.table(tableName, TableSchema.fromClass(clazz)).createTable();
+    public void createTable(DynamoTable table) {
+        getTable(table).createTable();
     }
 
-    public void deleteTable(Class clazz, String tableName) {
-        database.table(tableName, TableSchema.fromClass(clazz)).deleteTable();
+    public void deleteTable(DynamoTable table) {
+        getTable(table).deleteTable();
     }
 
-    public Iterator<Object> getAllRecords(Class clazz, String tableName) {
-        return database.table(tableName, TableSchema.fromBean(clazz)).scan().items().iterator();
+    public Iterator<Object> getAllRecords(DynamoTable table) {
+        return getTable(table).scan().items().iterator();
     }
 
-    public void insertRecord(Class clazz, String tableName, Object payload) {
-        database.table(tableName, TableSchema.fromBean(clazz)).putItem(payload);
+    public void insertRecord(DynamoTable table, Object payload) {
+        getTable(table).putItem(payload);
+    }
+
+    private DynamoDbTable getTable(DynamoTable table) {
+        return database.table(table.tableName(), TableSchema.fromBean(table.getClass()));
     }
 }

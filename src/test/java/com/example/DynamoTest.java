@@ -2,6 +2,10 @@ package com.example;
 
 import java.util.Iterator;
 import java.util.concurrent.TimeUnit;
+
+import com.example.table.DynamoTable;
+import com.example.table.ProductTable;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,29 +26,30 @@ public class DynamoTest {
   @Test
   @Timeout(value = 10, unit = TimeUnit.SECONDS)
   public void testProductTable() {
+    DynamoTable productTable = new ProductTable();
     String price = "50";
     String cost = "20";
 
     try {
-      dynamo.deleteTable(Product.class, "Product");
-    } catch (Exception e) {
-      System.out.println(e);
-    }
-    
-    try {
-      dynamo.createTable(Product.class, "Product");
+      dynamo.deleteTable(productTable);
     } catch (Exception e) {
       System.out.println(e);
     }
 
-    Iterator records = dynamo.getAllRecords(Product.class, "Product");
+    try {
+      dynamo.createTable(productTable);
+    } catch (Exception e) {
+      System.out.println(e);
+    }
+
+    Iterator records = dynamo.getAllRecords(productTable);
     assertFalse(records.hasNext());
 
-    dynamo.insertRecord(Product.class, "Product", new Product(price, cost));
-    records = dynamo.getAllRecords(Product.class, "Product");
+    dynamo.insertRecord(productTable, new ProductTable(price, cost));
+    records = dynamo.getAllRecords(productTable);
     assertTrue(records.hasNext());
 
-    Product record = (Product) records.next();
+    ProductTable record = (ProductTable) records.next();
     assertEquals(price, record.getPrice());
     assertEquals(cost, record.getCost());
     assertFalse(records.hasNext());

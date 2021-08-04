@@ -1,19 +1,19 @@
-package com.example;
+package com.example.table;
 
 import java.util.UUID;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbPartitionKey;
 
 @DynamoDbBean
-public class Product {
+public class ProductTable implements DynamoTable {
     private String id;
     private String price;
     private String cost;
 
-    public Product() {
+    public ProductTable() {
     }
 
-    public Product(String price, String cost) {
+    public ProductTable(String price, String cost) {
         this.id = UUID.randomUUID().toString();
         this.price = price;
         this.cost = cost;
@@ -42,5 +42,10 @@ public class Product {
 
     public void setCost(String cost) {
         this.cost = cost;
+    }
+
+    @Override
+    public String tableName() {
+        return "Product";
     }
 }
