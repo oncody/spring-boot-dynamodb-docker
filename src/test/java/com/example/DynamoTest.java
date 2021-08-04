@@ -28,11 +28,13 @@ public class DynamoTest {
     try {
       dynamo.deleteTable(Product.class, "Product");
     } catch (Exception e) {
+      System.out.println(e);
     }
     
     try {
       dynamo.createTable(Product.class, "Product");
     } catch (Exception e) {
+      System.out.println(e);
     }
 
     Iterator records = dynamo.getAllRecords(Product.class, "Product");
