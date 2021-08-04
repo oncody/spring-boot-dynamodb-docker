@@ -42,5 +42,6 @@ public class DynamoTest {
     assertEquals(price, record.getPrice());
     assertEquals(cost, record.getCost());
     assertFalse(records.hasNext());
+    System.out.println(record.getId());
   }
 }
