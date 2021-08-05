@@ -27,21 +27,13 @@ public class DynamoService {
     public void createTable(DynamoModel model) {
         CreateTableEnhancedRequest.Builder builder = CreateTableEnhancedRequest.builder();
         if (!model.globalIndexes().isEmpty()) {
-            if (model.globalIndexes().size() == 1) {
-                builder = builder.globalSecondaryIndices(model.globalIndexes().get(0).toGlobalSecondaryIndex());
-            } else {
-                builder = builder.globalSecondaryIndices(model.globalIndexes().stream()
-                        .map(index -> index.toGlobalSecondaryIndex()).collect(Collectors.toList()));
-            }
+            builder = builder.globalSecondaryIndices(model.globalIndexes().stream()
+                    .map(index -> index.toGlobalSecondaryIndex()).collect(Collectors.toList()));
         }
 
         if (!model.localIndexes().isEmpty()) {
-            if (model.localIndexes().size() == 1) {
-                builder = builder.localSecondaryIndices(model.localIndexes().get(0).toLocalSecondaryIndex());
-            } else {
-                builder = builder.localSecondaryIndices(model.localIndexes().stream()
-                        .map(index -> index.toLocalSecondaryIndex()).collect(Collectors.toList()));
-            }
+            builder = builder.localSecondaryIndices(model.localIndexes().stream()
+                    .map(index -> index.toLocalSecondaryIndex()).collect(Collectors.toList()));
         }
 
         CreateTableEnhancedRequest request = builder.build();
