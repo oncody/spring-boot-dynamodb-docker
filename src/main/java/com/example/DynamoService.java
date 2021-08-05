@@ -1,7 +1,6 @@
 package com.example;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -16,10 +15,6 @@ import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
 import software.amazon.awssdk.enhanced.dynamodb.model.CreateTableEnhancedRequest;
 import software.amazon.awssdk.enhanced.dynamodb.model.Page;
 import software.amazon.awssdk.enhanced.dynamodb.model.QueryConditional;
-import software.amazon.awssdk.services.dynamodb.model.ProjectionType;
-import software.amazon.awssdk.enhanced.dynamodb.model.EnhancedGlobalSecondaryIndex;
-import software.amazon.awssdk.services.dynamodb.model.ProvisionedThroughput;
-import software.amazon.awssdk.services.dynamodb.model.Projection;
 
 public class DynamoService {
     private final DynamoDbEnhancedClient database;

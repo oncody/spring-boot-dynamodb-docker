@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Iterator;
 import java.util.concurrent.TimeUnit;
 
-import com.example.model.DynamoModel;
 import com.example.model.Product;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -19,7 +18,6 @@ import software.amazon.awssdk.enhanced.dynamodb.model.QueryConditional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import java.util.UUID;
 
 @SpringBootTest(classes = { Config.class, DynamoService.class })
 public class DynamoTest {
