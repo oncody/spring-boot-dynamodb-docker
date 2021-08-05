@@ -53,10 +53,20 @@ public class DynamoService {
         getTable(model).deleteTable();
     }
 
-    public List indexQuery(DynamoModel model, String indexName, QueryConditional query) {
-        // DynamoDbIndex index = getTable(model).index(indexName);
-        // Iterator<Page> results = index.query(query).iterator();
+    public List query(DynamoModel model, QueryConditional query) {
         Iterator<Page> results = getTable(model).query(query).iterator();
+        List records = new ArrayList<>();
+        while (results.hasNext()) {
+            Page record = results.next();
+            records.addAll(record.items());
+        }
+
+        return records;
+    }
+
+    public List indexQuery(DynamoModel model, String indexName, QueryConditional query) {
+        DynamoDbIndex index = getTable(model).index(indexName);
+        Iterator<Page> results = index.query(query).iterator();
         List records = new ArrayList<>();
         while (results.hasNext()) {
             Page record = results.next();
@@ -70,8 +80,8 @@ public class DynamoService {
         return getTable(model).scan().items().iterator();
     }
 
-    public void insertRecord(DynamoModel model, Object payload) {
-        getTable(model).putItem(payload);
+    public void insertRecord(DynamoModel model) {
+        getTable(model).putItem(model);
     }
 
     private DynamoDbTable getTable(DynamoModel model) {

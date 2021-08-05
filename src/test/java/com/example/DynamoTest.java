@@ -23,6 +23,10 @@ import java.util.UUID;
 @SpringBootTest(classes = { Config.class, DynamoService.class })
 public class DynamoTest {
   private final DynamoService dynamo;
+  private static final int ID = 1;
+  private static final int PRICE = 50;
+  private static final int COST = 20;
+  private static final Product PRODUCT = new Product(ID, PRICE, COST);
 
   DynamoTest(@Autowired DynamoService dynamo) {
     this.dynamo = dynamo;
@@ -31,54 +35,47 @@ public class DynamoTest {
   @Test
   @Timeout(value = 5, unit = TimeUnit.SECONDS)
   public void testTablesCreatedAreEmpty() {
-    DynamoModel productTable = new Product();
-
     try {
-      dynamo.deleteTable(productTable);
+      dynamo.deleteTable(PRODUCT);
     } catch (Exception e) {
       System.out.println(e);
     }
 
     try {
-      dynamo.createTable(productTable);
+      dynamo.createTable(PRODUCT);
     } catch (Exception e) {
       System.out.println(e);
     }
 
-    Iterator records = dynamo.getAllRecords(productTable);
+    Iterator records = dynamo.getAllRecords(PRODUCT);
     assertFalse(records.hasNext());
   }
 
   @Test
   @Timeout(value = 5, unit = TimeUnit.SECONDS)
   public void testInsertingAndGettingRecord() {
-    DynamoModel productTable = new Product();
-    int id = 1;
-    int price = 50;
-    int cost = 20;
-
     try {
-      dynamo.deleteTable(productTable);
+      dynamo.deleteTable(PRODUCT);
     } catch (Exception e) {
       System.out.println(e);
     }
 
     try {
-      dynamo.createTable(productTable);
+      dynamo.createTable(PRODUCT);
     } catch (Exception e) {
       System.out.println(e);
     }
 
-    dynamo.insertRecord(productTable, new Product(id, price, cost));
+    dynamo.insertRecord(PRODUCT);
 
-    Iterator records = dynamo.getAllRecords(productTable);
-    records = dynamo.getAllRecords(productTable);
+    Iterator records = dynamo.getAllRecords(PRODUCT);
+    records = dynamo.getAllRecords(PRODUCT);
     assertTrue(records.hasNext());
 
     Product record = (Product) records.next();
-    assertEquals(id, record.getId());
-    assertEquals(price, record.getPrice());
-    assertEquals(cost, record.getCost());
+    assertEquals(PRODUCT.getId(), record.getId());
+    assertEquals(PRODUCT.getPrice(), record.getPrice());
+    assertEquals(PRODUCT.getCost(), record.getCost());
     assertFalse(records.hasNext());
     System.out.println(record.getId());
   }
@@ -86,35 +83,31 @@ public class DynamoTest {
   @Test
   @Timeout(value = 5, unit = TimeUnit.SECONDS)
   public void testInsertingAndGettingRecordWithIndex() {
-    DynamoModel productTable = new Product();
-    int id = 1;
-    int price = 50;
-    int cost = 20;
 
     try {
-      dynamo.deleteTable(productTable);
+      dynamo.deleteTable(PRODUCT);
     } catch (Exception e) {
       System.out.println(e);
     }
 
     try {
-      dynamo.createTable(productTable);
+      dynamo.createTable(PRODUCT);
     } catch (Exception e) {
       System.out.println(e);
     }
 
-    dynamo.insertRecord(productTable, new Product(id, price, cost));
+    dynamo.insertRecord(PRODUCT);
 
-    Key key = Key.builder().partitionValue(id).build();
+    Key key = Key.builder().partitionValue(PRODUCT.getId()).build();
     QueryConditional query = QueryConditional.keyEqualTo(key);
     System.out.println("Test Value: " + Product.PRICE_INDEX_QUERY);
-    List records = dynamo.indexQuery(productTable, Product.PRICE_INDEX_QUERY, query);
+    List records = dynamo.query(PRODUCT, query);
     assertEquals(1, records.size());
 
     Product record = (Product) records.get(0);
-    assertEquals(id, record.getId());
-    assertEquals(price, record.getPrice());
-    assertEquals(cost, record.getCost());
+    assertEquals(PRODUCT.getId(), record.getId());
+    assertEquals(PRODUCT.getPrice(), record.getPrice());
+    assertEquals(PRODUCT.getCost(), record.getCost());
     System.out.println(record.getId());
   }
 }
