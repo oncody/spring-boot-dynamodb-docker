@@ -49,19 +49,13 @@ public class DynamoTable<T extends DynamoModel> {
     }
 
     public List<T> query(QueryConditional query) {
-        return StreamSupport.stream(getTable().query(query).spliterator(), false).flatMap(page -> page.items().stream()).collect(Collectors.toList());
+        return StreamSupport.stream(getTable().query(query).spliterator(), false).flatMap(page -> page.items().stream())
+                .collect(Collectors.toList());
     }
 
     public List<T> indexQuery(GlobalIndex globalIndex, QueryConditional query) {
-        DynamoDbIndex<T> tableIndex = getTable().index(globalIndex.indexName());
-        Iterator<Page<T>> results = tableIndex.query(query).iterator();
-        List<T> records = new ArrayList<>();
-        while (results.hasNext()) {
-            Page<T> record = results.next();
-            records.addAll(record.items());
-        }
-
-        return records;
+        return StreamSupport.stream(getTable().index(globalIndex.indexName()).query(query).spliterator(), false)
+                .flatMap(page -> page.items().stream()).collect(Collectors.toList());
     }
 
     public List<T> getAllRecords() {
