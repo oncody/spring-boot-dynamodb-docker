@@ -3,11 +3,8 @@ package com.example;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Spliterator;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
-import java.util.Collection;
 
 import com.example.model.interfaces.DynamoModel;
 import com.example.model.interfaces.GlobalIndex;
