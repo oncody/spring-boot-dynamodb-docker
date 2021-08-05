@@ -7,6 +7,7 @@ import java.util.concurrent.TimeUnit;
 import com.example.model.DynamoModel;
 import com.example.model.Product;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,18 +24,14 @@ import java.util.UUID;
 @SpringBootTest(classes = { Config.class, DynamoService.class })
 public class DynamoTest {
   private final DynamoService dynamo;
-  private static final int ID = 1;
-  private static final int PRICE = 50;
-  private static final int COST = 20;
-  private static final Product PRODUCT = new Product(ID, PRICE, COST);
+  private static final Product PRODUCT = new Product(1, 50, 20);
 
   DynamoTest(@Autowired DynamoService dynamo) {
     this.dynamo = dynamo;
   }
 
-  @Test
-  @Timeout(value = 5, unit = TimeUnit.SECONDS)
-  public void testTablesCreatedAreEmpty() {
+  @BeforeEach
+  public void setup() {
     try {
       dynamo.deleteTable(PRODUCT);
     } catch (Exception e) {
@@ -46,7 +43,11 @@ public class DynamoTest {
     } catch (Exception e) {
       System.out.println(e);
     }
+  }
 
+  @Test
+  @Timeout(value = 5, unit = TimeUnit.SECONDS)
+  public void testTablesCreatedAreEmpty() {
     Iterator records = dynamo.getAllRecords(PRODUCT);
     assertFalse(records.hasNext());
   }
@@ -54,18 +55,6 @@ public class DynamoTest {
   @Test
   @Timeout(value = 5, unit = TimeUnit.SECONDS)
   public void testInsertingAndGettingRecord() {
-    try {
-      dynamo.deleteTable(PRODUCT);
-    } catch (Exception e) {
-      System.out.println(e);
-    }
-
-    try {
-      dynamo.createTable(PRODUCT);
-    } catch (Exception e) {
-      System.out.println(e);
-    }
-
     dynamo.insertRecord(PRODUCT);
 
     Iterator records = dynamo.getAllRecords(PRODUCT);
@@ -83,19 +72,6 @@ public class DynamoTest {
   @Test
   @Timeout(value = 5, unit = TimeUnit.SECONDS)
   public void testInsertingAndGettingRecordWithIndex() {
-
-    try {
-      dynamo.deleteTable(PRODUCT);
-    } catch (Exception e) {
-      System.out.println(e);
-    }
-
-    try {
-      dynamo.createTable(PRODUCT);
-    } catch (Exception e) {
-      System.out.println(e);
-    }
-
     dynamo.insertRecord(PRODUCT);
 
     Key key = Key.builder().partitionValue(PRODUCT.getId()).build();
