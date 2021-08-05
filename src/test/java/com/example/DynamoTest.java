@@ -21,22 +21,22 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @SpringBootTest(classes = { Config.class })
 public class DynamoTest {
   private static final Product PRODUCT = new Product(1, 50, 20);
-  private final DynamoService<Product> dynamo;
+  private final DynamoTable<Product> productTable;
 
   DynamoTest(@Autowired DynamoDbEnhancedClient database) {
-    dynamo = new DynamoService<>(database, Product.class, PRODUCT);
+    productTable = new DynamoTable<>(database, Product.class, PRODUCT);
   }
 
   @BeforeEach
   public void setup() {
     try {
-      dynamo.deleteTable();
+      productTable.deleteTable();
     } catch (Exception e) {
       System.out.println(e);
     }
 
     try {
-      dynamo.createTable();
+      productTable.createTable();
     } catch (Exception e) {
       System.out.println(e);
     }
@@ -45,17 +45,17 @@ public class DynamoTest {
   @Test
   @Timeout(value = 5, unit = TimeUnit.SECONDS)
   public void testTablesCreatedAreEmpty() {
-    List<Product> records = dynamo.getAllRecords();
+    List<Product> records = productTable.getAllRecords();
     assertTrue(records.isEmpty());
   }
 
   @Test
   @Timeout(value = 5, unit = TimeUnit.SECONDS)
   public void testInsertingAndGettingRecord() {
-    dynamo.insertRecord(PRODUCT);
+    productTable.insertRecord(PRODUCT);
 
-    List<Product> records = dynamo.getAllRecords();
-    records = dynamo.getAllRecords();
+    List<Product> records = productTable.getAllRecords();
+    records = productTable.getAllRecords();
     assertEquals(1, records.size());
 
     Product record = (Product) records.get(0);
@@ -67,11 +67,11 @@ public class DynamoTest {
   @Test
   @Timeout(value = 5, unit = TimeUnit.SECONDS)
   public void testInsertingAndGettingRecordWithQuery() {
-    dynamo.insertRecord(PRODUCT);
+    productTable.insertRecord(PRODUCT);
 
     Key key = Key.builder().partitionValue(PRODUCT.getId()).build();
     QueryConditional query = QueryConditional.keyEqualTo(key);
-    List<Product> records = dynamo.query(query);
+    List<Product> records = productTable.query(query);
     assertEquals(1, records.size());
 
     Product record = (Product) records.get(0);
@@ -84,11 +84,11 @@ public class DynamoTest {
   @Test
   @Timeout(value = 5, unit = TimeUnit.SECONDS)
   public void testInsertingAndGettingRecordWithIndex() {
-    dynamo.insertRecord(PRODUCT);
+    productTable.insertRecord(PRODUCT);
 
     Key key = Key.builder().partitionValue(PRODUCT.getPrice()).build();
     QueryConditional query = QueryConditional.keyEqualTo(key);
-    List<Product> records = dynamo.indexQuery(Product.PRICE_GLOBAL_INDEX, query);
+    List<Product> records = productTable.indexQuery(Product.PRICE_GLOBAL_INDEX, query);
     assertEquals(1, records.size());
 
     Product record = (Product) records.get(0);

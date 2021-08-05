@@ -17,12 +17,12 @@ import software.amazon.awssdk.enhanced.dynamodb.model.CreateTableEnhancedRequest
 import software.amazon.awssdk.enhanced.dynamodb.model.Page;
 import software.amazon.awssdk.enhanced.dynamodb.model.QueryConditional;
 
-public class DynamoService<T extends DynamoModel> {
+public class DynamoTable<T extends DynamoModel> {
     private final DynamoDbEnhancedClient database;
     private final Class<T> clazz;
     private final T model;
 
-    public DynamoService(DynamoDbEnhancedClient database, Class<T> clazz, T model) {
+    public DynamoTable(DynamoDbEnhancedClient database, Class<T> clazz, T model) {
         this.database = database;
         this.clazz = clazz;
         this.model = model;
