@@ -32,8 +32,6 @@ public class DynamoTest {
   @Timeout(value = 5, unit = TimeUnit.SECONDS)
   public void testTablesCreatedAreEmpty() {
     DynamoModel productTable = new Product();
-    String price = "50";
-    String cost = "20";
 
     try {
       dynamo.deleteTable(productTable);
@@ -55,9 +53,9 @@ public class DynamoTest {
   @Timeout(value = 5, unit = TimeUnit.SECONDS)
   public void testInsertingAndGettingRecord() {
     DynamoModel productTable = new Product();
-    String id = "1";
-    String price = "50";
-    String cost = "20";
+    int id = 1;
+    int price = 50;
+    int cost = 20;
 
     try {
       dynamo.deleteTable(productTable);
@@ -89,9 +87,9 @@ public class DynamoTest {
   @Timeout(value = 5, unit = TimeUnit.SECONDS)
   public void testInsertingAndGettingRecordWithIndex() {
     DynamoModel productTable = new Product();
-    String id = "1";
-    String price = "50";
-    String cost = "20";
+    int id = 1;
+    int price = 50;
+    int cost = 20;
 
     try {
       dynamo.deleteTable(productTable);
@@ -107,7 +105,7 @@ public class DynamoTest {
 
     dynamo.insertRecord(productTable, new Product(id, price, cost));
 
-    Key key = Key.builder().partitionValue("1").build();
+    Key key = Key.builder().partitionValue(id).build();
     QueryConditional query = QueryConditional.keyEqualTo(key);
     System.out.println("Test Value: " + Product.PRICE_INDEX_QUERY);
     List records = dynamo.indexQuery(productTable, Product.PRICE_INDEX_QUERY, query);

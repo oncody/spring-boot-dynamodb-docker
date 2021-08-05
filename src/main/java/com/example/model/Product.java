@@ -17,14 +17,14 @@ import software.amazon.awssdk.services.dynamodb.model.ProvisionedThroughput;
 public class Product implements DynamoModel {
     public static final String PRICE_INDEX_QUERY = "priceIndex";
 
-    private String id;
-    private String price;
-    private String cost;
+    private int id;
+    private int price;
+    private int cost;
 
     public Product() {
     }
 
-    public Product(String id, String price, String cost) {
+    public Product(int id, int price, int cost) {
         // this.id = UUID.randomUUID().toString();
         this.id = id;
         this.price = price;
@@ -32,29 +32,29 @@ public class Product implements DynamoModel {
     }
 
     @DynamoDbPartitionKey
-    public String getId() {
+    public int getId() {
         return id;
     }
 
     @DynamoDbSecondaryPartitionKey(indexNames = { PRICE_INDEX_QUERY })
-    public String getPrice() {
+    public int getPrice() {
         return price;
     }
 
     @DynamoDbSecondarySortKey(indexNames = { PRICE_INDEX_QUERY })
-    public String getCost() {
+    public int getCost() {
         return cost;
     }
 
-    public void setId(String id) {
+    public void setId(int id) {
         this.id = id;
     }
 
-    public void setPrice(String price) {
+    public void setPrice(int price) {
         this.price = price;
     }
 
-    public void setCost(String cost) {
+    public void setCost(int cost) {
         this.cost = cost;
     }
 
