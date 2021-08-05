@@ -9,7 +9,7 @@ import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbSecon
 @DynamoDbBean
 public class Product implements DynamoModel {
     public static final PriceGlobalIndex PRICE_GLOBAL_INDEX = new PriceGlobalIndex();
-    
+
     private static final String PRICE_GLOBAL_INDEX_NAME = "priceIndex";
 
     private static final class PriceGlobalIndex extends GlobalIndex {
@@ -43,7 +43,6 @@ public class Product implements DynamoModel {
         return price;
     }
 
-    @DynamoDbSecondarySortKey(indexNames = { PRICE_GLOBAL_INDEX_NAME })
     public int getCost() {
         return cost;
     }
