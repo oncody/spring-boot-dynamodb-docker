@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.example.model.DynamoModel;
+import com.example.model.GlobalIndex;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
@@ -62,9 +63,9 @@ public class DynamoService {
         return records;
     }
 
-    public List indexQuery(DynamoModel model, String indexName, QueryConditional query) {
-        DynamoDbIndex index = getTable(model).index(indexName);
-        Iterator<Page> results = index.query(query).iterator();
+    public List indexQuery(DynamoModel model, GlobalIndex globalIndex, QueryConditional query) {
+        DynamoDbIndex tableIndex = getTable(model).index(globalIndex.indexName());
+        Iterator<Page> results = tableIndex.query(query).iterator();
         List records = new ArrayList<>();
         while (results.hasNext()) {
             Page record = results.next();

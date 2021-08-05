@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Iterator;
 import java.util.concurrent.TimeUnit;
 
+import com.example.model.GlobalIndex;
 import com.example.model.Product;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -69,12 +70,29 @@ public class DynamoTest {
 
   @Test
   @Timeout(value = 5, unit = TimeUnit.SECONDS)
-  public void testInsertingAndGettingRecordWithIndex() {
+  public void testInsertingAndGettingRecordWithQuery() {
     dynamo.insertRecord(PRODUCT);
 
     Key key = Key.builder().partitionValue(PRODUCT.getId()).build();
     QueryConditional query = QueryConditional.keyEqualTo(key);
     List records = dynamo.query(PRODUCT, query);
+    assertEquals(1, records.size());
+
+    Product record = (Product) records.get(0);
+    assertEquals(PRODUCT.getId(), record.getId());
+    assertEquals(PRODUCT.getPrice(), record.getPrice());
+    assertEquals(PRODUCT.getCost(), record.getCost());
+    System.out.println(record.getId());
+  }
+
+  @Test
+  @Timeout(value = 5, unit = TimeUnit.SECONDS)
+  public void testInsertingAndGettingRecordWithIndex() {
+    dynamo.insertRecord(PRODUCT);
+
+    Key key = Key.builder().partitionValue(PRODUCT.getPrice()).build();
+    QueryConditional query = QueryConditional.keyEqualTo(key);
+    List records = dynamo.indexQuery(PRODUCT, Product.PRICE_GLOBAL_INDEX, query);
     assertEquals(1, records.size());
 
     Product record = (Product) records.get(0);

@@ -8,10 +8,14 @@ import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbSecon
 
 @DynamoDbBean
 public class Product implements DynamoModel {
-    public static final class PriceGlobalIndex extends GlobalIndex {
+    public static final PriceGlobalIndex PRICE_GLOBAL_INDEX = new PriceGlobalIndex();
+    
+    private static final String PRICE_GLOBAL_INDEX_NAME = "priceIndex";
+
+    private static final class PriceGlobalIndex extends GlobalIndex {
         @Override
         public String indexName() {
-            return "priceIndex";
+            return PRICE_GLOBAL_INDEX_NAME;
         }
     }
 
@@ -34,12 +38,12 @@ public class Product implements DynamoModel {
         return id;
     }
 
-    @DynamoDbSecondaryPartitionKey(indexNames = { "priceIndex" })
+    @DynamoDbSecondaryPartitionKey(indexNames = { PRICE_GLOBAL_INDEX_NAME })
     public int getPrice() {
         return price;
     }
 
-    @DynamoDbSecondarySortKey(indexNames = { "priceIndex" })
+    @DynamoDbSecondarySortKey(indexNames = { PRICE_GLOBAL_INDEX_NAME })
     public int getCost() {
         return cost;
     }
@@ -63,7 +67,7 @@ public class Product implements DynamoModel {
 
     @Override
     public List<GlobalIndex> globalIndexes() {
-        return List.of(new PriceGlobalIndex());
+        return List.of(PRICE_GLOBAL_INDEX);
     }
 
     @Override
