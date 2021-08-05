@@ -1,6 +1,11 @@
 package com.example.model;
 
 import java.util.List;
+
+import com.example.model.interfaces.DynamoModel;
+import com.example.model.interfaces.GlobalIndex;
+import com.example.model.interfaces.LocalIndex;
+
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbPartitionKey;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbSecondaryPartitionKey;

@@ -5,8 +5,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.example.model.DynamoModel;
-import com.example.model.GlobalIndex;
+import com.example.model.interfaces.DynamoModel;
+import com.example.model.interfaces.GlobalIndex;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;

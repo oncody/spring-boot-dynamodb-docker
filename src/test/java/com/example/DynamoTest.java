@@ -4,8 +4,8 @@ import java.util.List;
 import java.util.Iterator;
 import java.util.concurrent.TimeUnit;
 
-import com.example.model.GlobalIndex;
 import com.example.model.Product;
+import com.example.model.interfaces.GlobalIndex;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

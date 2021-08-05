@@ -1,4 +1,4 @@
-package com.example.model;
+package com.example.model.interfaces;
 
 import software.amazon.awssdk.enhanced.dynamodb.model.EnhancedLocalSecondaryIndex;
 import software.amazon.awssdk.services.dynamodb.model.Projection;
