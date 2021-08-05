@@ -76,7 +76,6 @@ public class DynamoTest {
 
     Key key = Key.builder().partitionValue(PRODUCT.getId()).build();
     QueryConditional query = QueryConditional.keyEqualTo(key);
-    System.out.println("Test Value: " + Product.PRICE_INDEX_QUERY);
     List records = dynamo.query(PRODUCT, query);
     assertEquals(1, records.size());
 

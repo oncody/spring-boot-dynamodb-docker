@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.example.model.DynamoModel;
 
@@ -29,19 +30,21 @@ public class DynamoService {
 
     public void createTable(DynamoModel model) {
         CreateTableEnhancedRequest.Builder builder = CreateTableEnhancedRequest.builder();
-        if (!model.globalSecondaryIndices().isEmpty()) {
-            if (model.globalSecondaryIndices().size() == 1) {
-                builder = builder.globalSecondaryIndices(model.globalSecondaryIndices().get(0));
+        if (!model.globalIndexes().isEmpty()) {
+            if (model.globalIndexes().size() == 1) {
+                builder = builder.globalSecondaryIndices(model.globalIndexes().get(0).toGlobalSecondaryIndex());
             } else {
-                builder = builder.globalSecondaryIndices(model.globalSecondaryIndices());
+                builder = builder.globalSecondaryIndices(model.globalIndexes().stream()
+                        .map(index -> index.toGlobalSecondaryIndex()).collect(Collectors.toList()));
             }
         }
 
-        if (!model.localSecondaryIndices().isEmpty()) {
-            if (model.localSecondaryIndices().size() == 1) {
-                builder = builder.localSecondaryIndices(model.localSecondaryIndices().get(0));
+        if (!model.localIndexes().isEmpty()) {
+            if (model.localIndexes().size() == 1) {
+                builder = builder.localSecondaryIndices(model.localIndexes().get(0).toLocalSecondaryIndex());
             } else {
-                builder = builder.localSecondaryIndices(model.localSecondaryIndices());
+                builder = builder.localSecondaryIndices(model.localIndexes().stream()
+                        .map(index -> index.toLocalSecondaryIndex()).collect(Collectors.toList()));
             }
         }
 
