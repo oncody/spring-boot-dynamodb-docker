@@ -13,32 +13,32 @@ import org.junit.jupiter.api.Timeout;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
 import software.amazon.awssdk.enhanced.dynamodb.Key;
 import software.amazon.awssdk.enhanced.dynamodb.model.QueryConditional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@SpringBootTest(classes = { Config.class, DynamoService.class })
+@SpringBootTest(classes = { Config.class })
 public class DynamoTest {
-  private final DynamoService dynamo;
   private static final Product PRODUCT = new Product(1, 50, 20);
+  private final DynamoService<Product> dynamo;
 
-  DynamoTest(@Autowired DynamoService dynamo) {
-    this.dynamo = dynamo;
+  DynamoTest(@Autowired DynamoDbEnhancedClient database) {
+    dynamo = new DynamoService<>(database, Product.class, PRODUCT);
   }
 
   @BeforeEach
   public void setup() {
     try {
-      dynamo.deleteTable(PRODUCT);
+      dynamo.deleteTable();
     } catch (Exception e) {
       System.out.println(e);
     }
 
     try {
-      dynamo.createTable(PRODUCT);
+      dynamo.createTable();
     } catch (Exception e) {
       System.out.println(e);
     }
@@ -47,8 +47,8 @@ public class DynamoTest {
   @Test
   @Timeout(value = 5, unit = TimeUnit.SECONDS)
   public void testTablesCreatedAreEmpty() {
-    Iterator records = dynamo.getAllRecords(PRODUCT);
-    assertFalse(records.hasNext());
+    List<Product> records = dynamo.getAllRecords();
+    assertTrue(records.isEmpty());
   }
 
   @Test
@@ -56,16 +56,14 @@ public class DynamoTest {
   public void testInsertingAndGettingRecord() {
     dynamo.insertRecord(PRODUCT);
 
-    Iterator records = dynamo.getAllRecords(PRODUCT);
-    records = dynamo.getAllRecords(PRODUCT);
-    assertTrue(records.hasNext());
+    List<Product> records = dynamo.getAllRecords();
+    records = dynamo.getAllRecords();
+    assertEquals(1, records.size());
 
-    Product record = (Product) records.next();
+    Product record = (Product) records.get(0);
     assertEquals(PRODUCT.getId(), record.getId());
     assertEquals(PRODUCT.getPrice(), record.getPrice());
     assertEquals(PRODUCT.getCost(), record.getCost());
-    assertFalse(records.hasNext());
-    System.out.println(record.getId());
   }
 
   @Test
@@ -75,7 +73,7 @@ public class DynamoTest {
 
     Key key = Key.builder().partitionValue(PRODUCT.getId()).build();
     QueryConditional query = QueryConditional.keyEqualTo(key);
-    List records = dynamo.query(PRODUCT, query);
+    List<Product> records = dynamo.query(query);
     assertEquals(1, records.size());
 
     Product record = (Product) records.get(0);
@@ -92,7 +90,7 @@ public class DynamoTest {
 
     Key key = Key.builder().partitionValue(PRODUCT.getPrice()).build();
     QueryConditional query = QueryConditional.keyEqualTo(key);
-    List records = dynamo.indexQuery(PRODUCT, Product.PRICE_GLOBAL_INDEX, query);
+    List<Product> records = dynamo.indexQuery(Product.PRICE_GLOBAL_INDEX, query);
     assertEquals(1, records.size());
 
     Product record = (Product) records.get(0);

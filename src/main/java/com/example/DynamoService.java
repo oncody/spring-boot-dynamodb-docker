@@ -3,12 +3,15 @@ package com.example;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Spliterator;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
+import java.util.Collection;
 
 import com.example.model.interfaces.DynamoModel;
 import com.example.model.interfaces.GlobalIndex;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbIndex;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbTable;
@@ -17,14 +20,18 @@ import software.amazon.awssdk.enhanced.dynamodb.model.CreateTableEnhancedRequest
 import software.amazon.awssdk.enhanced.dynamodb.model.Page;
 import software.amazon.awssdk.enhanced.dynamodb.model.QueryConditional;
 
-public class DynamoService {
+public class DynamoService<T extends DynamoModel> {
     private final DynamoDbEnhancedClient database;
+    private final Class<T> clazz;
+    private final T model;
 
-    public DynamoService(@Autowired DynamoDbEnhancedClient database) {
+    public DynamoService(DynamoDbEnhancedClient database, Class<T> clazz, T model) {
         this.database = database;
+        this.clazz = clazz;
+        this.model = model;
     }
 
-    public void createTable(DynamoModel model) {
+    public void createTable() {
         CreateTableEnhancedRequest.Builder builder = CreateTableEnhancedRequest.builder();
         if (!model.globalIndexes().isEmpty()) {
             builder = builder.globalSecondaryIndices(model.globalIndexes().stream()
@@ -37,45 +44,45 @@ public class DynamoService {
         }
 
         CreateTableEnhancedRequest request = builder.build();
-        getTable(model).createTable(request);
+        getTable().createTable(request);
     }
 
-    public void deleteTable(DynamoModel model) {
-        getTable(model).deleteTable();
+    public void deleteTable() {
+        getTable().deleteTable();
     }
 
-    public List query(DynamoModel model, QueryConditional query) {
-        Iterator<Page> results = getTable(model).query(query).iterator();
-        List records = new ArrayList<>();
+    public List<T> query(QueryConditional query) {
+        Iterator<Page<T>> results = getTable().query(query).iterator();
+        List<T> records = new ArrayList<>();
         while (results.hasNext()) {
-            Page record = results.next();
+            Page<T> record = results.next();
             records.addAll(record.items());
         }
 
         return records;
     }
 
-    public List indexQuery(DynamoModel model, GlobalIndex globalIndex, QueryConditional query) {
-        DynamoDbIndex tableIndex = getTable(model).index(globalIndex.indexName());
-        Iterator<Page> results = tableIndex.query(query).iterator();
-        List records = new ArrayList<>();
+    public List<T> indexQuery(GlobalIndex globalIndex, QueryConditional query) {
+        DynamoDbIndex<T> tableIndex = getTable().index(globalIndex.indexName());
+        Iterator<Page<T>> results = tableIndex.query(query).iterator();
+        List<T> records = new ArrayList<>();
         while (results.hasNext()) {
-            Page record = results.next();
+            Page<T> record = results.next();
             records.addAll(record.items());
         }
 
         return records;
     }
 
-    public Iterator getAllRecords(DynamoModel model) {
-        return getTable(model).scan().items().iterator();
+    public List<T> getAllRecords() {
+        return StreamSupport.stream(getTable().scan().items().spliterator(), false).collect(Collectors.toList());
     }
 
-    public void insertRecord(DynamoModel model) {
-        getTable(model).putItem(model);
+    public void insertRecord(T model) {
+        getTable().putItem(model);
     }
 
-    private DynamoDbTable getTable(DynamoModel model) {
-        return database.table(model.modelName(), TableSchema.fromBean(model.getClass()));
+    private DynamoDbTable<T> getTable() {
+        return database.table(model.modelName(), TableSchema.fromBean(clazz));
     }
 }
